@@ -1,24 +1,27 @@
 # Decentralized Lottery
 
+<br/>
+<p align="center">
+<a href="https://chain.link" target="_blank">
+<img src="./img/web-app.png" width="500" alt="Web App">
+</a>
+</p>
+<br/>
+
+
 - [Decentralized Lottery](#decentralized-lottery)
-- [Chainlink Hardhat Box](#chainlink-hardhat-box)
+- [Clever Programmer Lottery](#clever-programmer-lottery)
 - [Getting Started](#getting-started)
   - [Requirements](#requirements)
   - [Quickstart](#quickstart)
-    - [Typescript](#typescript)
 - [Useage](#useage)
   - [Deploying Contracts](#deploying-contracts)
   - [Run a Local Network](#run-a-local-network)
   - [Using a Testnet or Live Network (like Mainnet or Polygon)](#using-a-testnet-or-live-network-like-mainnet-or-polygon)
     - [Kovan Ethereum Testnet Setup](#kovan-ethereum-testnet-setup)
   - [Forking](#forking)
-  - [Auto-Funding](#auto-funding)
 - [Test](#test)
-- [Interacting with Deployed Contracts](#interacting-with-deployed-contracts)
-  - [Chainlink Price Feeds](#chainlink-price-feeds)
-  - [Request & Receive Data](#request--receive-data)
-  - [VRF Get a random number](#vrf-get-a-random-number)
-  - [Keepers](#keepers)
+  - [Scripts](#scripts)
   - [Verify on Etherscan](#verify-on-etherscan)
 - [View Contracts Size](#view-contracts-size)
 - [Linting](#linting)
@@ -26,18 +29,14 @@
 - [Estimaging Gas](#estimaging-gas)
 - [Contributing](#contributing)
 - [Thank You!](#thank-you)
-  - [Resources](#resources)
+- [Resources](#resources)
 
-# Chainlink Hardhat Box
- Implementation of the following 4 Chainlink features using the [Hardhat](https://hardhat.org/) development environment:
- - [Chainlink Price Feeds](https://docs.chain.link/docs/using-chainlink-reference-contracts)
- - [Chainlink VRF](https://docs.chain.link/docs/chainlink-vrf)
- - [Chainlink Keepers](https://docs.chain.link/docs/chainlink-keepers/introduction/)
- - [Request & Receive data](https://docs.chain.link/docs/request-and-receive-data)
+# Clever Programmer Lottery
+ Implementation of a completed decentralized lottery, using [Chainlink VRF](https://docs.chain.link/docs/chainlink-vrf) to get a random number and [Chainlink Keepers](https://docs.chain.link/docs/chainlink-keepers/introduction/) to keep the lottery running. 
 
 # Getting Started 
 
-It's recommended that you've gone through the [hardhat getting started documentation](https://hardhat.org/getting-started/) before proceeding here. 
+It's recommended that you've gone through the [hardhat getting started documentation](https://hardhat.org/getting-started/) before proceeding here. This repo is based off the [Hardhat Starter Kit](https://github.com/smartcontractkit/hardhat-starter-kit) which may also be a helpful resource. 
 
 ## Requirements
 
@@ -50,6 +49,8 @@ It's recommended that you've gone through the [hardhat getting started documenta
   - You'll know you've installed yarn right if you can run:
     - `yarn --version` And get an output like: `x.x.x`
     - You might need to install it with npm
+- [Metamask](https://metamask.io/)
+  - You'll see a little fox icon in the top right corner of the browser you're using. 
 
 ## Quickstart
 
@@ -58,8 +59,8 @@ It's recommended that you've gone through the [hardhat getting started documenta
 After installing all the requirements, run the following:
 
 ```bash
-git clone https://github.com/smartcontractkit/hardhat-starter-kit/
-cd hardhat-starter-kit
+git clone https://github.com/smartcontractkit/clever-lottery-web3
+cd clever-lottery-web3
 ```
 Then:
 ```
@@ -71,7 +72,7 @@ or
 npm i
 ```
 
-2. You can now do stuff!
+2. Test
 
 ```
 yarn hardhat test
@@ -80,17 +81,109 @@ yarn hardhat test
 or
 
 ```
-yarn hardhat test
+npx hardhat test
 ```
 
-### Typescript
-
-To use typescript, run:
+3. Run your local node
 
 ```
-git checkout typescript
+UPDATE_FRONT_END=true hardhat node
+```
+
+or
+
+```
+UPDATE_FRONT_END=true npx hardhat node
+```
+
+You'll get an output like: 
+```
+Nothing to compile
+Local network detected! Deploying mocks...
+deploying "VRFCoordinatorV2Mock" (tx: 0xb1811099ad4653047586f3d30dea9d8cae51f74a48277c9ab76ac8ab3ed95b61)...: deployed at 0x5FbDB2315678afecb367f032d93F642f64180aa3 with 1803306 gas
+Mocks Deployed!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+You are deploying to a local network, you'll need a local network running to interact
+Please run `yarn hardhat console --network localhost` to interact with the deployed smart contracts!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+----------------------------------------------------
+deploying "Lottery" (tx: 0xc95271276097da9fdfe52ea5ea0e15c7166fbe8be2db49464f2be054d5505e53)...: deployed at 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9 with 1595990 gas
+Run Price Feed contract with command:
+yarn hardhat run scripts/enterLottery.js --network localhost
+----------------------------------------------------
+Writing to front end...
+Front end written!
+Started HTTP and WebSocket JSON-RPC server at http://127.0.0.1:8545/
+
+Accounts
+========
+
+WARNING: These accounts, and their private keys, are publicly known.
+Any funds sent to them on Mainnet or any other live network WILL BE LOST.
+
+Account #0: 0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266 (10000 ETH)
+Private Key: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+.
+.
+.
+.
+```
+
+Keep this terminal running, and we'll come back to that `Private Key` later. 
+
+
+4. Setup your front end
+
+In a second terminal, run: 
+
+```
+cd front-end
 yarn
+yarn run dev
 ```
+
+or
+
+```
+cd front-end
+npm i 
+npm run dev
+```
+
+5. Connect your metamask to your local node
+
+Go to your browser to your metamask. Hit "networks" and "add network". 
+
+<img src="./img/metamask.png" width="300" alt="Metamask">
+
+Add the following information and hit save:
+
+  - Network Name: hardhat-localhost
+  - New RPC URL: http://127.0.0.1:8545/
+  - Chain ID: 31337
+  - Currency Symbol: ETH
+  - Block Explorer URL: (Leave Blank)
+
+Then, switch to that network.
+
+<img src="./img/switch-network.png" width="300" alt="Metamask">
+
+
+6. Add your local private key
+
+Hit the big circle and select "Import Account"
+
+<img src="./img/import-account.png" width="300" alt="Metamask">
+
+Add one of the private keys from step 1 where we ran the node. And you should see a balance in your metamask of 10,000 ETH on your hardhat-localhost network. 
+
+7. Go to your front end
+
+Go to http://localhost:3000/
+
+And you should be able to interact with your lottery!
+
+> Note: If you restart your hardhat node, you'll have to "reset" your private key account. In your metamask, just go to "Settings" -> "Advanced" -> "Reset Account". Make sure you only do this on your hardhat-localhost network. 
 
 # Useage
 
@@ -114,7 +207,9 @@ yarn hardhat node
 
 You'll get a local blockchain, private keys, contracts deployed (from the `deploy` folder scripts), and an endpoint to potentially add to an EVM wallet. 
 
-## Using a Testnet or Live Network (like Mainnet or Polygon)
+## Using a Testnet or Live Network (like Mainnet or Polygon) 
+
+> Note: Right now, keepers isn't on rinkeby, so we can only test on BSC or Mainnet. It'll be deployed to rinkeby soon!
 
 In your `hardhat.config.js` you'll see section like:
 
@@ -200,16 +295,6 @@ If you'd like to run tests or on a network that is a [forked network](https://ha
 ```
 
 
-## Auto-Funding
-
-This Starter Kit is configured by default to attempt to auto-fund any newly deployed contract that uses Any-API or Chainlink VRF, to save having to manually fund them after each deployment. The amount in LINK to send as part of this process can be modified in the [Starter Kit Config](helper-hardhat-config.js), and are configurable per network.
-
-| Parameter  | Description                                       | Default Value |
-| ---------- | :------------------------------------------------ | :------------ |
-| fundAmount | Amount of LINK to transfer when funding contracts | 0.1 LINK      |
-
-If you wish to deploy the smart contracts without performing the auto-funding, add an `AUTO_FUND` environment variable, and set it to false. 
-
 
 # Test
 Tests are located in the [test](./test/) directory, and are split between unit tests and staging/testnet tests. Unit tests should only be run on local environments, and staging tests should only run on live environments.
@@ -224,75 +309,18 @@ Or
 yarn hardhat test
 ```
 
-To run integration tests:
 
-```bash
-yarn test-integration
+## Scripts
+
+For entering a lottery:
+```
+yarn hardhat run scripts/enter.js
 ```
 
-or
+For mocking a Chainlink keeper node / Chainlink VRF node:
 
 ```
-yarn hardhat test --network kovan
-```
-
-# Interacting with Deployed Contracts
-
-After deploying your contracts. 
-The deployment output will give you the contract addresses as they are deployed. You can then use these contract addresses in conjunction with Hardhat tasks to perform operations on each contract.
-
-
-## Chainlink Price Feeds
-The Price Feeds consumer contract has one task, to read the latest price of a specified price feed contract
-
-```bash
-yarn hardhat read-price-feed --contract insert-contract-address-here --network network
-```
-
-## Request & Receive Data
-The APIConsumer contract has two tasks, one to request external data based on a set of parameters, and one to check to see what the result of the data request is. This contract needs to be funded with link first:
-
-```bash
-yarn hardhat fund-link --contract insert-contract-address-here --network network
-```
-
-Once it's funded, you can request external data by passing in a number of parameters to the request-data task. The contract parameter is mandatory, the rest are optional
-
-```bash
-yarn hardhat request-data --contract insert-contract-address-here --network network
-```
-
-Once you have successfully made a request for external data, you can see the result via the read-data task
-```bash
-yarn hardhat read-data --contract insert-contract-address-here --network network
-```
-
-
-## VRF Get a random number
-The VRFConsumer contract has two tasks, one to request a random number, and one to read the result of the random number request. This contract needs to be funded with link first:
-
-```bash
-yarn hardhat fund-link --contract insert-contract-address-here --network network
-```
-
-Once it's funded, you can perform a VRF request with the request-random-number task:
-
-```bash
-yarn hardhat request-random-number --contract insert-contract-address-here --network network
-```
-
-Once you have successfully made a request for a random number, you can see the result via the read-random-number task:
-
-```bash
-yarn hardhat read-random-number --contract insert-contract-address-here --network network
-```
-
-## Keepers
-The KeepersCounter contract is a simple Chainlink Keepers enabled contract that simply maintains a counter variable that gets incremented each time the performUpkeep task is performed by a Chainlink Keeper. Once the contract is deployed, you should head to [https://keepers.chain.link/](https://keepers.chain.link/) to register it for upkeeps, then you can use the task below to view the counter variable that gets incremeneted by Chainlink Keepers
-
-
-```bash
-yarn hardhat read-keepers-counter --contract insert-contract-address-here --network network
+yarn hardhat run scripts/mockOffchain.js
 ```
 
 ## Verify on Etherscan
@@ -347,7 +375,7 @@ Contributions are always welcome! Open a PR or an issue!
 
 # Thank You!
 
-## Resources
+# Resources
 
 - [Chainlink Documentation](https://docs.chain.link/)
 - [Hardhat Documentation](https://hardhat.org/getting-started/)
